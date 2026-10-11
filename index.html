@@ -1,0 +1,339 @@
+<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>lo-tools.be · evaluatietool</title><script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script><style>:root{font-family:system-ui,-apple-system,sans-serif;color:#172b3a;background:#f5f7fa}*{box-sizing:border-box}body{margin:0}header{background:#12324a;color:white;padding:18px 24px}header h1{margin:0;font-size:22px}header small{opacity:.8}main{max-width:1200px;margin:20px auto;padding:0 14px}nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}button,.button{font:inherit;border:1px solid #b8c7d2;background:white;border-radius:9px;padding:10px 13px;cursor:pointer;color:#12324a}button:hover{background:#eaf2f8}button.primary,.primary{background:#126b8c;color:white;border-color:#126b8c}button.active{background:#12324a;color:white}section{background:white;border:1px solid #dbe3e9;border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 2px 8px #15304709}h2{margin:0 0 12px;font-size:20px}h3{font-size:16px}p,small{color:#526475}input,select,textarea{font:inherit;padding:9px;border:1px solid #becbd4;border-radius:7px;max-width:100%}input[type=file]{max-width:280px}textarea{width:100%;min-height:80px;resize:vertical}.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}.hidden{display:none!important}.tablewrap{overflow:auto;max-height:65vh}table{border-collapse:separate;border-spacing:0;width:100%;min-width:620px}th,td{border-bottom:1px solid #e3e9ee;padding:8px;text-align:left;vertical-align:middle}th{background:#edf3f6;position:sticky;top:0;z-index:2}th:first-child,td:first-child{position:sticky;left:0;background:white;z-index:1;min-width:130px}th:first-child{background:#edf3f6;z-index:3}.editor td textarea{min-width:170px}.editor th input{min-width:130px;width:100%}.segments{display:flex;gap:3px;min-width:110px}.segments button{padding:10px 0;flex:1;border:0;background:#e8edf1;border-radius:4px;font-weight:700;font-size:13px}.segments button.sel{color:white}.segments button:nth-child(1).sel{background:#cc645e}.segments button:nth-child(2).sel{background:#d6a338}.segments button:nth-child(3).sel{background:#4b91cc}.segments button:nth-child(4).sel{background:#32966d}.segments button:nth-child(n+5).sel{background:#6e69ba}.hint{background:#eff7fb;border-radius:9px;padding:12px;font-size:14px}.pill{background:#e9f0f4;border-radius:99px;padding:6px 10px}.cardrow{display:flex;gap:10px;flex-wrap:wrap}.cardrow label{display:flex;gap:6px;align-items:center}#toast{position:fixed;bottom:16px;right:16px;background:#173e54;color:white;padding:12px 16px;border-radius:9px;display:none;z-index:10}.rubricprint{display:none}@media print{header,main,nav,#toast{display:none!important}.rubricprint{display:block!important}body{background:white}.rubricprint table{min-width:0;border-collapse:collapse;font-size:10pt}.rubricprint th,.rubricprint td{border:1px solid #777;position:static!important;vertical-align:top}.rubricprint h1{text-align:center}}@media(max-width:700px){section{padding:12px}header{padding:13px}.segments{min-width:105px}th,td{padding:5px}}.rubric-name-dialog{max-width:440px}.rubric-name-dialog form{display:flex;flex-direction:column;gap:12px}.rubric-name-dialog form>input{width:100%;box-sizing:border-box;padding:12px;font-size:16px;border:1px solid #d6d6d6;border-radius:9px}.rubric-name-dialog form>label{font-weight:600}
+/* Selected level colors: highest performance at the left, lowest at the right. */
+#eval .segments button.sel:first-child{background:#268866}
+#eval .segments button.sel:nth-child(2):not(:last-child){background:#417dbb}
+#eval .segments button.sel:nth-last-child(2):not(:first-child){background:#d09a30}
+#eval .segments button.sel:last-child{background:#c45454}
+/* For four levels, preserve the blue second level (not orange). */
+#eval .segments button.sel:nth-child(2):nth-last-child(3){background:#417dbb}
+</style><style>
+:root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#151515;background:#f8f8f8}body{color:#151515;background:#f8f8f8}header{background:#fff;color:#111;border-bottom:1px solid #e7e7e7;padding:23px max(24px,calc((100vw - 1240px)/2))}header h1{font-size:23px;letter-spacing:-.7px;font-weight:750}header small{color:#777}main{max-width:1240px;margin:26px auto;padding:0 22px}nav{border-bottom:1px solid #e4e4e4;gap:22px;margin-bottom:22px}nav button{border:0;border-bottom:2px solid transparent;border-radius:0;padding:13px 3px;background:transparent;color:#777;font-weight:600}nav button.active{background:transparent;color:#111;border-color:#111}nav button:hover{background:transparent;color:#111}section{border:1px solid #ebebeb;box-shadow:0 3px 18px #00000005;border-radius:16px;padding:25px}h2{font-size:21px;letter-spacing:-.5px}h3{letter-spacing:-.3px}p,small{color:#6c6c6c}button,.button{border:1px solid #dcdcdc;color:#242424;background:#fff;border-radius:8px;font-size:14px;font-weight:550;transition:background .15s,border-color .15s}button:hover{background:#f4f4f4;border-color:#bcbcbc}button.primary,.primary{background:#171717;border-color:#171717;color:#fff}button.primary:hover{background:#353535}button.active{background:#171717;color:white}input,select,textarea{border:1px solid #dedede;border-radius:8px;background:white;color:#171717}input:focus,select:focus,textarea:focus{outline:2px solid #999;outline-offset:1px}.hint{background:#f7f7f7;border:1px solid #ededed;color:#666;padding:13px 15px;line-height:1.5}.pill{background:#f1f1f1;color:#333}th{background:#f7f7f7;color:#333;font-size:13px}th:first-child{background:#f7f7f7}th,td{border-color:#eee}#toast{background:#191919}.segments button{background:#f0f0f0;color:#777}.segments button:hover{background:#dedede}.segments button.sel{color:#fff}.segments button:nth-child(1).sel{background:#c45454}.segments button:nth-child(2).sel{background:#d09a30}.segments button:nth-child(3).sel{background:#417dbb}.segments button:nth-child(4).sel{background:#268866}.empty-state{text-align:center;padding:65px 20px 75px;border:1px dashed #dedede;border-radius:14px;background:#fcfcfc;margin-top:20px}.empty-state h3{font-size:20px;margin:12px 0 8px}.empty-state p{max-width:420px;margin:0 auto 22px;line-height:1.6}.empty-icon{margin:auto;width:56px;height:56px;display:grid;place-items:center;background:#f0f0f0;border-radius:14px;font-size:30px;font-weight:300}.editor textarea{min-height:104px}.actions{gap:9px;margin:16px 0}.editor th input{font-weight:600}.editor td:first-child input{font-weight:600}@media(max-width:700px){main{padding:0 12px;margin:14px auto}section{padding:16px}header{padding:17px}nav{gap:17px}.empty-state{padding:40px 15px}}
+</style><style>
+header{padding:12px max(22px,calc((100vw - 1240px)/2))}header h1{font-size:17px}header>small{display:none}main{margin-top:16px}nav{margin-bottom:14px}section{padding:20px}#eval .eval-section{padding-top:16px}#eval .eval-toolbar{display:flex;align-items:center;justify-content:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:14px}.session-identity{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}.session-identity input{font-size:14px;padding:9px 11px}.session-identity input:first-child{width:245px;font-weight:650}.session-identity input[type=date]{width:158px;color:#666}.toolbar-buttons{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.iconbutton{white-space:nowrap;padding:9px 12px}.settings-panel{background:#fafafa;border:1px solid #e9e9e9;border-radius:10px;padding:10px 13px;margin-bottom:14px}.settings-panel .actions{margin:2px 0 8px}.rubric-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #e9e9e9;margin-bottom:12px}.rubric-tabs{display:flex;align-items:center;gap:3px;overflow-x:auto;min-width:0;scrollbar-width:thin}.rubric-tab{white-space:nowrap;border:0;border-bottom:2px solid transparent;border-radius:0;padding:12px 17px;background:transparent;color:#777;font-weight:550}.rubric-tab.selected{border-bottom-color:#111;color:#111;background:transparent;font-weight:750}.rubric-tab:hover{background:#f5f5f5}.rubric-bar .pill{white-space:nowrap;font-size:12px;padding:5px 9px}.info{font-size:13px;color:#666}.info summary{cursor:pointer;width:max-content;max-width:100%;padding:7px 0;color:#777}.info p{margin:5px 0 10px;line-height:1.5}.compact-info{margin-bottom:7px}.tablewrap{max-height:72vh}#eval th button{font-weight:650}#eval .segments button{min-height:38px}@media(max-width:700px){#eval .eval-section{padding:12px}.session-identity input:first-child{width:185px}.session-identity input[type=date]{width:145px}.desktop-label{display:none}.rubric-tab{padding:12px 11px}.rubric-bar{gap:5px}.rubric-bar .pill{font-size:11px}.iconbutton{font-size:17px;padding:7px 10px}}
+</style><style>
+#design h2{margin-bottom:10px}#design .actions{margin:10px 0}#design .design-rubric-bar{margin:10px 0 8px}#design .rubric-tab{padding:10px 15px}#design #excelInfo{background:#f7f7f7;border:1px solid #e9e9e9;border-radius:9px;padding:8px 13px;margin:5px 0}#design #excelInfo p{margin:2px 0}.editor-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:9px 0 12px}.editor-name{display:flex;align-items:center;gap:8px;font-size:14px}.editor-name input{width:200px}.editor-tools{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.editor-tools button{padding:9px 11px}.editor-tools .delete-icon{display:grid;place-items:center;color:#666;padding:9px;width:40px;height:39px}.editor-tools .delete-icon:hover{color:#b42318;background:#fff4f4;border-color:#e6b8b8}
+@page{size:A4 landscape;margin:9mm 10mm}
+@media print{html,body{margin:0!important;padding:0!important;background:#fff!important}body>*:not(#print){display:none!important}#print{display:block!important;width:100%!important;max-width:none!important;margin:0 auto!important;padding:0!important;color:#111!important;print-color-adjust:exact;-webkit-print-color-adjust:exact}#print h1{text-align:center!important;font-size:15pt!important;line-height:1.2!important;margin:0 0 6mm!important;font-weight:700!important}#print table{width:100%!important;min-width:0!important;table-layout:fixed!important;border-collapse:collapse!important;font-size:8.3pt!important;line-height:1.24!important;margin:0 auto!important}#print th,#print td{border:0.5pt solid #666!important;padding:2.2mm 2mm!important;vertical-align:top!important;overflow-wrap:anywhere!important;word-break:normal!important;white-space:normal!important;position:static!important;background:#fff!important;color:#111!important}#print thead th{background:#f1f1f1!important;text-align:left!important;font-weight:700!important}#print tbody th{text-align:left!important;font-weight:700!important}#print tr{break-inside:avoid;page-break-inside:avoid}#print thead{display:table-header-group}}
+@media(max-width:700px){.editor-name input{width:145px}.editor-tools{gap:4px}.editor-tools button{padding:8px}}
+
+/* Uniforme evaluatiematrix en snelle groepsbeoordeling */
+#eval .tablewrap table.eval-matrix{width:max-content;min-width:100%;table-layout:fixed}
+#eval .eval-matrix th:first-child,#eval .eval-matrix td:first-child{width:185px;min-width:185px;max-width:185px}
+#eval .eval-matrix th.criterion-col,#eval .eval-matrix td.criterion-col{width:190px;min-width:190px;max-width:190px;padding:6px}
+#eval .eval-matrix th.criterion-col button{display:block;width:100%;min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;padding:9px 6px}
+#eval .eval-matrix .segments{width:100%;min-width:0;gap:3px}
+#eval .eval-matrix .segments button{min-width:0;padding:9px 0}
+.bulk-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.36);display:flex;align-items:center;justify-content:center;padding:16px;z-index:100}
+.bulk-dialog{background:#fff;color:#161616;border-radius:16px;padding:22px;width:min(420px,100%);box-shadow:0 20px 70px #0003}
+.bulk-dialog h3{margin:0 0 6px;font-size:20px}.bulk-dialog p{margin:0 0 17px;font-size:13px;line-height:1.5}
+.bulk-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.bulk-head button{padding:5px 10px}
+.bulk-levels{display:flex;gap:7px}.bulk-levels button{flex:1;min-width:0;padding:17px 0;font-size:19px;font-weight:750;background:#f1f1f1}
+.bulk-levels button:hover{background:#222;color:white}
+#undoBar{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:110;background:#171717;color:#fff;border-radius:10px;padding:9px 12px;display:flex;align-items:center;gap:14px;box-shadow:0 8px 28px #0003;font-size:13px}
+#undoBar button{background:#fff;color:#111;padding:6px 10px}
+@media(max-width:700px){#eval .eval-matrix th:first-child,#eval .eval-matrix td:first-child{width:125px;min-width:125px;max-width:125px}#eval .eval-matrix th.criterion-col,#eval .eval-matrix td.criterion-col{width:165px;min-width:165px;max-width:165px}}
+</style><style>
+.student-name{display:flex;align-items:center;gap:9px;white-space:nowrap}.group-dot{display:inline-block;flex:none;width:10px;height:10px;border-radius:50%;border:1px solid #0002}.group-dialog{max-width:570px!important;max-height:min(85vh,760px);overflow-y:auto}.group-existing{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 18px}.group-chip{display:flex;align-items:center;gap:7px}.group-label{display:block;font-size:13px;font-weight:650;margin:12px 0 7px}.group-label input{display:block;width:100%;margin-top:6px}.group-colors{display:flex;gap:9px;flex-wrap:wrap;margin-top:9px}.group-color{width:34px;height:34px;border-radius:50%;padding:0;background:var(--group-color);border:3px solid #fff;box-shadow:0 0 0 1px #ddd}.group-color.chosen{box-shadow:0 0 0 2px #161616}.group-students{border:1px solid #e5e5e5;border-radius:9px;max-height:255px;overflow:auto}.group-student{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid #eee;font-size:14px;cursor:pointer}.group-student:last-child{border-bottom:0}.group-student input{width:17px;height:17px;flex:none}.group-student small{margin-left:auto;font-size:11px}.group-footer{display:flex;align-items:center;gap:8px;margin:0 0 14px;padding:10px 0 12px;flex-wrap:wrap;position:sticky;top:0;background:#fff;z-index:3;border-bottom:1px solid #eee}.group-spacer{flex:1}#groupSelectedCount{color:#777;font-weight:400;margin-left:8px}
+</style><style>
+/* Compacte groepseditor: één regel acties, alleen leerlingenlijst scrollt */
+.group-dialog{max-width:640px!important;max-height:min(90dvh,800px);overflow:hidden!important;display:flex;flex-direction:column;padding:20px!important}
+.group-dialog .bulk-head{flex:none;margin-bottom:8px!important}
+.group-dialog .bulk-head h3{margin:0 0 3px!important;font-size:21px!important}
+.group-dialog .bulk-head p{margin:0!important;font-size:12px!important}
+.group-existing{flex:none;margin:7px 0!important;gap:5px!important;align-items:center}
+.group-existing button{padding:6px 9px!important;font-size:12px!important;min-height:32px}
+.group-footer{flex:none;position:static!important;margin:0 0 8px!important;padding:7px 0!important;gap:6px!important;flex-wrap:nowrap!important}
+.group-footer button{padding:7px 10px!important;font-size:12px!important;white-space:nowrap;min-height:34px}
+.group-footer .group-delete{color:#666}.group-footer .primary{padding:7px 12px!important;font-size:12px!important}
+.group-label{flex:none;margin:7px 0 4px!important;font-size:12px!important}
+.group-label input{margin-top:4px!important;padding:7px 9px!important}
+.group-colors{margin-top:5px!important;gap:7px!important}
+.group-color{width:30px!important;height:30px!important}
+.group-students{flex:1;min-height:90px;max-height:none!important;overflow-y:auto!important}
+.group-student{padding:7px 10px!important}
+@media(max-width:500px){.group-dialog{padding:14px!important}.group-footer button{font-size:11px!important;padding:7px!important}.group-existing button{font-size:11px!important}}
+</style><style>
+#eval .eval-toolbar{margin-bottom:10px}
+#eval .session-identity input:first-child{width:min(330px,60vw)}
+#eval .settings-panel{padding:13px;margin-bottom:12px}
+.settings-grid{display:flex;align-items:end;flex-wrap:wrap;gap:8px}
+.settings-grid button{padding:9px 11px;font-size:13px}
+.settings-date{display:flex;flex-direction:column;gap:4px;font-size:12px;color:#666}
+.settings-date input{padding:8px;font-size:13px;max-width:160px}
+#evalInfoModal .bulk-dialog p{margin:12px 0;line-height:1.6}
+@media(max-width:700px){#eval .session-identity input:first-child{width:min(235px,60vw)}}
+ .design-main-actions{justify-content:flex-end} .empty-state button{margin:4px} #eval .eval-toolbar{justify-content:space-between!important} .rubric-info-list{margin:8px 0 14px;padding-left:22px;line-height:1.55;color:#333}.rubric-info-list li{margin:3px 0}#eval .eval-toolbar{justify-content:flex-start!important} #designSettingsButton,#settingsButton{background:#171717!important;color:#fff!important;border-color:#171717!important}#designSettingsButton:hover,#settingsButton:hover{background:#333!important;border-color:#333!important}.score-dialog{max-width:min(900px,95vw)!important;max-height:90vh;overflow:auto}.score-modes{display:flex;flex-direction:column;align-items:flex-start;gap:14px;margin:16px 0}.score-modes label{display:flex;align-items:center;gap:6px;cursor:pointer}.score-table{min-width:500px}.score-table th{position:static}.score-table th:first-child{min-width:140px}.score-table td input{width:80px;min-width:55px}.score-footer{display:flex;justify-content:flex-end;margin-top:14px}.total-col{min-width:105px!important;text-align:center!important}.total-value{font-weight:750}.manual-score{width:92px;text-align:center}#scoreModal .bulk-backdrop{z-index:20}@media(max-width:700px){.score-modes{flex-direction:column;gap:10px}} </style><style>
+/* Responsieve evaluatiematrix: breedte delen en bruikbare aanraakknoppen */
+#eval .tablewrap{width:100%;overflow-x:auto}
+#eval .tablewrap table.eval-matrix{width:100%;min-width:0;table-layout:fixed}
+#eval .eval-matrix th:first-child,#eval .eval-matrix td:first-child{width:clamp(112px,17%,180px);min-width:0;max-width:none;overflow:hidden}
+#eval .eval-matrix th.criterion-col,#eval .eval-matrix td.criterion-col{width:auto;min-width:0;max-width:none;padding:5px 3px}
+#eval .eval-matrix th.total-col,#eval .eval-matrix td.total-col{width:90px;min-width:0!important;max-width:90px;padding:5px 3px}
+#eval .eval-matrix .segments{width:100%;min-width:0;gap:2px}
+#eval .eval-matrix .segments button{min-width:0;min-height:42px;padding:8px 0;font-size:clamp(11px,1.2vw,14px)}
+#eval .eval-matrix .student-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+#eval .eval-matrix th.criterion-col button{font-size:clamp(11px,1.1vw,14px)}
+.manual-score-button{width:100%;padding:10px 2px;font-weight:700;min-height:42px}
+.score-max-setting{display:flex;align-items:center;gap:12px;margin:14px 0}.score-max-setting input{width:78px}.score-max-setting span{color:#666}
+.score-picker-backdrop{position:fixed;inset:0;background:#0004;z-index:160;display:flex;justify-content:center;align-items:center;padding:12px}
+.score-picker{background:#fff;border-radius:14px;padding:16px;width:min(320px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow-y:auto;box-shadow:0 12px 40px #0003}
+.score-picker-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin-top:14px}
+.score-picker-grid button{min-height:46px;padding:7px 0;font-weight:700;font-size:16px;background:#f1f1f1;border:0}
+.score-picker-grid button.chosen{background:#417dbb;color:white}
+.score-clear{margin-top:10px;width:100%}
+@media(max-width:800px){#eval .eval-matrix th:first-child,#eval .eval-matrix td:first-child{width:120px}#eval .eval-matrix th.total-col,#eval .eval-matrix td.total-col{width:76px;max-width:76px}#eval .eval-matrix .segments button{min-height:44px} }
+@media(max-width:600px){#eval .tablewrap table.eval-matrix{min-width:max-content;width:100%}#eval .eval-matrix th.criterion-col,#eval .eval-matrix td.criterion-col{width:125px;min-width:125px;max-width:125px}}
+</style><style>
+/* Eén rustige bovenste regel met rubric-tabs, naam en opties. */
+#design .design-topline{display:flex;align-items:center;gap:12px;min-height:52px;margin-bottom:14px;flex-wrap:wrap}
+#design .design-rubric-bar{display:flex;align-items:center;gap:5px;min-width:0;flex:0 1 auto;max-width:52%;border-bottom:1px solid #e8e8e8}
+#design .design-rubric-bar .rubric-tabs{min-width:0}
+#design .design-rubric-bar .rubric-tab{padding:10px 13px}
+#design .add-rubric-tab{padding:5px 11px;min-width:34px;font-size:21px;font-weight:400;line-height:1.2;background:#fff;border:1px solid #ddd;border-radius:8px;margin:0 4px;flex-shrink:0}
+#design .design-name-inline{display:flex;align-items:center;gap:9px;font-size:14px;white-space:nowrap;min-width:0}
+#design .design-name-inline input{width:190px;max-width:27vw;font-weight:600;padding:9px 10px}
+#design #designSettingsButton{margin-left:auto;white-space:nowrap}
+#design .design-edit-actions{border-top:1px solid #e8e8e8;margin-top:10px;padding-top:10px}
+#design .design-edit-actions.hidden{display:none}
+@media(max-width:700px){#design .design-topline{gap:7px}#design .design-rubric-bar{max-width:100%;order:1;flex:1 1 100%}#design .design-name-inline{order:2}#design .design-name-inline input{max-width:42vw;width:160px}#design #designSettingsButton{order:3}}
+</style><style>
+.count-dialog{max-width:430px!important}.count-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:18px 0}.count-grid button{min-height:48px;font-weight:700;background:#f2f2f2}.count-grid button.chosen{background:#171717;color:white}.count-note{font-size:12px;color:#777;margin:4px 0}
+</style><style>
+#design #autoScoreToggle{background:#171717;color:#fff;border-color:#171717;margin-left:auto;white-space:nowrap}
+#design #autoScoreToggle:hover{background:#333}
+#design #autoScoreToggle:not(.hidden)+#designSettingsButton{margin-left:0}
+#design .point-control{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:8px;white-space:nowrap}
+#design .point-control button{min-width:32px;min-height:34px;padding:3px 8px;font-size:18px;font-weight:600;touch-action:manipulation}
+#design .point-control span{font-size:13px;font-weight:700;min-width:26px;text-align:center;font-variant-numeric:tabular-nums}
+#design .editor td:first-child .point-control{justify-content:flex-start}
+.score-note{font-size:13px;line-height:1.5;color:#666;margin:10px 0}
+@media(max-width:700px){#design #autoScoreToggle{margin-left:0;order:2}#design #designSettingsButton{margin-left:auto;order:3}}
+</style><style>
+#design #autoScoreToggle,#design #manualScoreToggle{background:#171717;color:white;border-color:#171717;margin-left:0;white-space:nowrap}
+#design #autoScoreToggle:hover,#design #manualScoreToggle:hover{background:#333}
+#design .score-matrix-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:12px 0;font-size:14px}
+#design .score-editor td{vertical-align:middle;padding:16px 8px}
+#design .score-editor th{vertical-align:middle}
+#design .score-editor td:first-child{min-width:170px}
+#design .score-editor .criterion-maximum{font-size:12px;color:#666;margin-top:7px}
+#design .score-editor .point-control{margin:9px 0}
+.empty-start-actions{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin-top:20px}.empty-start-actions button{min-height:44px} #eval .eval-toolbar{justify-content:flex-end!important;margin-bottom:10px}
+#eval .toolbar-buttons{margin-left:auto}
+#eval .session-title{font-size:17px;font-weight:750;margin:4px 0 9px;overflow-wrap:anywhere}
+#sessionNameModal .rubric-name-dialog input{width:100%;max-width:100%}
+</style><style id="compact-score-matrix">
+/* Compact, touch-friendly point editor. Keep scrolling stable when a value changes. */
+#design .score-editor{table-layout:fixed;min-width:0}
+#design .score-editor th,#design .score-editor td{padding:7px 8px;vertical-align:middle}
+#design .score-editor tbody tr{height:58px}
+#design .score-editor td:first-child{min-width:155px;width:24%}
+#design .score-editor th:first-child{width:24%}
+#design .score-editor .criterion-maximum{margin-top:2px;font-size:11px}
+#design .score-editor .point-control{margin:3px 0;gap:5px}
+#design .score-editor .point-control button{min-width:36px;min-height:36px;padding:3px 7px}
+#design .score-editor .point-control span{min-width:24px}
+#design .score-editor td:first-child .point-control{display:inline-flex;margin-left:10px;vertical-align:middle}
+#design .score-editor td:first-child strong{display:inline-block;max-width:100%;vertical-align:middle}
+#design .score-editor td:first-child .criterion-maximum{display:inline-block;margin-left:8px}
+#design .score-editor thead .point-control{margin-top:4px}
+#design .score-editor th>div:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:750px){#design .score-editor{min-width:620px}#design .score-editor td:first-child .point-control{margin-left:0;display:flex}#design .score-editor td:first-child .criterion-maximum{margin-left:0;display:block}}
+</style></head><body><header><h1>lo-tools.be <small>· evaluatietool</small></h1><small>Rubrics ontwerpen en leerlingen snel beoordelen — lokaal in je browser</small></header><main><nav><button id="navDesign" class="active" onclick="show('design')">Rubricontwerper</button><button id="navEval" onclick="show('eval')">Evalueren</button></nav><div id="design"><section><div class="design-topline"><div id="rubricSelector" class="design-rubric-bar"><div id="designTabs" class="rubric-tabs" role="tablist" aria-label="Rubrics bewerken"></div><button class="add-rubric-tab" type="button" onclick="newRubric()" title="Nieuwe rubric toevoegen" aria-label="Nieuwe rubric toevoegen">+</button></div><button type="button" id="designSettingsButton" aria-expanded="false" aria-controls="designSettings" onclick="toggleDesignSettings()">Meer opties ▾</button><input class="hidden" id="rubricFile" type="file" accept=".xlsx,.xls" onchange="importRubrics(event)"></div><div id="designSettings" class="settings-panel hidden"><div class="settings-grid"><button onclick="newRubric()">Rubric toevoegen</button><button onclick="deleteRubric()">Rubric verwijderen</button><button onclick="document.getElementById('rubricFile').click()">Rubrics importeren</button><button onclick="exportRubrics()">Rubrics exporteren</button><button onclick="printRubric()">Rubric afdrukken</button><button type="button" id="excelInfoBtn" aria-haspopup="dialog" onclick="openRubricInfo()">Info</button></div><div id="designEditActions" class="settings-grid design-edit-actions"><button onclick="renameCurrentRubric()">Naam wijzigen</button><button onclick="openScoreSettings()">Score-instellingen</button><button type="button" id="autoScoreToggle" class="hidden" aria-pressed="false" onclick="toggleAutoScoreVisibility()">✓ Automatische scores: tonen ▾</button><button type="button" id="manualScoreToggle" class="hidden" onclick="openScoreSettings()">✓ Handmatige scores</button><button onclick="openCountPicker('criteria')">Criteria</button><button onclick="openCountPicker('levels')">Niveaus</button></div></div><div id="editor"></div></section></div><div id="eval" class="hidden"><section class="eval-section">
+<div class="eval-toolbar"><div class="toolbar-buttons"><button class="iconbutton" id="settingsButton" aria-expanded="false" aria-controls="sessionSettings" onclick="toggleSettings()" title="Meer opties">Meer opties ▾</button></div></div>
+<div id="sessionSettings" class="settings-panel hidden"><div class="settings-grid"><button type="button" onclick="openSessionNameDialog()">Sessienaam wijzigen</button><div class="settings-date"><label for="sessionDate">Datum</label><input aria-label="Datum" id="sessionDate" type="date" onchange="state.date=this.value"></div><button onclick="document.getElementById(&quot;classFile&quot;).click()">Klaslijst importeren</button><button onclick="addStudent()">Leerling toevoegen</button><button onclick="openGroups()">Groepen maken</button><button onclick="exportSession()">Sessie bewaren</button><button onclick="document.getElementById(&quot;sessionFile&quot;).click()">Sessie hervatten</button><button onclick="openEvalInfo()">Info</button></div><input id="classFile" class="hidden" type="file" accept=".xlsx,.xls" onchange="importClass(event)"><input id="sessionFile" class="hidden" type="file" accept=".xlsx" onchange="importSession(event)"></div>
+<div id="sessionTitle" class="session-title hidden"></div><div class="rubric-bar"><div id="evalTabs" class="rubric-tabs" role="tablist" aria-label="Rubrics"></div><span id="progress" class="pill"></span></div>
+<div id="evaluation"></div></section></div></main><div id="print" class="rubricprint"></div><div id="toast"></div><div id="bulkModal" class="hidden"></div><div id="groupModal" class="hidden"></div><div id="undoBar" class="hidden"></div><div id="evalInfoModal" class="hidden"></div><div id="rubricInfoModal" class="hidden"></div><div id="scorePickerModal" class="hidden"></div><div id="scoreModal" class="hidden"></div><div id="rubricNameModal" class="hidden"></div><div id="sessionNameModal" class="hidden"></div><div id="countModal" class="hidden"></div><script>
+const blank=()=>({scoreMode:'none',pointValues:[],manualScores:{},maxScore:20,id:crypto.randomUUID(),name:'Nieuwe rubric',criteria:['Criterium 1','Criterium 2'],levels:['Niveau 4','Niveau 3','Niveau 2','Niveau 1'],descriptions:Array.from({length:4},()=>['',''])});
+let editorRubricId='';
+const visibleAutoScores=new Set();
+let state={rubrics:[],students:[],scores:{},sessionName:'',date:new Date().toISOString().slice(0,10),activeRubric:'',groups:[],studentGroups:{}};
+const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(s){$('toast').textContent=s;$('toast').style.display='block';setTimeout(()=>$('toast').style.display='none',2700)}
+function show(tab){$('design').classList.toggle('hidden',tab!=='design');$('eval').classList.toggle('hidden',tab!=='eval');$('navDesign').classList.toggle('active',tab==='design');$('navEval').classList.toggle('active',tab==='eval');renderAll()}
+function chosen(){return state.rubrics.find(r=>r.id===editorRubricId)||state.rubrics[0]}
+function ensurePoints(r){if(!r.pointValues)r.pointValues=[];if(!r.manualScores)r.manualScores={};if(!r.scoreMode)r.scoreMode='none';if(!Number.isInteger(Number(r.maxScore))||Number(r.maxScore)<1)r.maxScore=20;r.criteria.forEach((_,j)=>{if(!r.pointValues[j])r.pointValues[j]=[];r.levels.forEach((_,n)=>{if(r.pointValues[j][n]===undefined)r.pointValues[j][n]=r.levels.length-1-n})})}
+function openScoreSettings(){const r=chosen();if(!r)return;ensurePoints(r);renderScoreSettings();$('scoreModal').classList.remove('hidden')}
+function closeScoreSettings(showAutomatic=false){const r=chosen();if(showAutomatic&&r?.scoreMode==='auto')visibleAutoScores.add(r.id);$('scoreModal').classList.add('hidden');$('scoreModal').innerHTML='';renderAll()}
+function setScoreMode(mode){const r=chosen();ensurePoints(r);r.scoreMode=mode;renderScoreSettings();renderEval()}
+function setPointValue(j,n,v){const r=chosen();ensurePoints(r);r.pointValues[j][n]=v===''?'':Number(v);renderEval()}
+function setMaxScore(v){const r=chosen();if(!r)return;const max=Math.max(1,Math.min(100,Math.round(Number(v)||20)));r.maxScore=max;Object.keys(r.manualScores||{}).forEach(k=>{if(Number(r.manualScores[k])>max)delete r.manualScores[k]});renderScoreSettings();renderEval()}
+function openManualPicker(rid,i,event){const r=state.rubrics.find(x=>x.id===rid);if(!r)return;ensurePoints(r);const max=r.maxScore;const existing=r.manualScores[i];const modal=$('scorePickerModal');modal.innerHTML=`<div class="score-picker-backdrop" onclick="if(event.target===this)closeManualPicker()"><div class="score-picker" role="dialog" aria-modal="true" aria-label="Totaalscore kiezen"><div class="bulk-head"><h3>Kies een score /${max}</h3><button onclick="closeManualPicker()" aria-label="Sluiten">×</button></div><div class="score-picker-grid">${Array.from({length:max+1},(_,j)=>max-j).map(n=>`<button class="${existing===n?'chosen':''}" onclick="chooseManualScore('${rid}',${i},${n})">${n}</button>`).join('')}</div><button class="score-clear" onclick="chooseManualScore('${rid}',${i},null)">Score wissen</button></div></div>`;modal.classList.remove('hidden');const rect=event?.currentTarget?.getBoundingClientRect();const picker=modal.querySelector('.score-picker');if(rect&&window.innerWidth>=700){picker.style.position='fixed';picker.style.left=Math.max(12,Math.min(rect.left,window.innerWidth-332))+'px';picker.style.top=Math.max(12,Math.min(rect.bottom+7,window.innerHeight-Math.min(480,picker.scrollHeight)-12))+'px'}}
+function closeManualPicker(){$('scorePickerModal').classList.add('hidden');$('scorePickerModal').innerHTML=''}
+function chooseManualScore(rid,i,n){setManualScore(rid,i,n===null?'':n);closeManualPicker();renderEval()}
+function setManualScore(rid,i,v){const r=state.rubrics.find(x=>x.id===rid);if(!r)return;ensurePoints(r);if(v==='')delete r.manualScores[i];else r.manualScores[i]=Number(v)}
+function totalScore(r,i){ensurePoints(r);let sum=0,any=false;r.criteria.forEach((_,j)=>{const n=state.scores[key(r.id,i,j)];if(n!==undefined){any=true;sum+=Number(r.pointValues[j]?.[n])||0}});return any?String(Math.round(sum*100)/100):'—'}
+function renderScoreSettings(){const r=chosen();ensurePoints(r);const mode=r.scoreMode;const modal=$('scoreModal');modal.innerHTML=`<div class="bulk-backdrop" onclick="if(event.target===this)closeScoreSettings()"><div class="bulk-dialog score-dialog" role="dialog" aria-modal="true" aria-label="Score-instellingen"><div class="bulk-head"><h3>Score-instellingen</h3><button onclick="closeScoreSettings()" aria-label="Sluiten">×</button></div><div class="score-modes"><label><input type="radio" name="scoreMode" value="none" ${mode==='none'?'checked':''} onchange="setScoreMode('none')"> Geen totaalscore</label><label><input type="radio" name="scoreMode" value="auto" ${mode==='auto'?'checked':''} onchange="setScoreMode('auto')"> Automatisch berekenen</label><label><input type="radio" name="scoreMode" value="manual" ${mode==='manual'?'checked':''} onchange="setScoreMode('manual')"> Handmatig invoeren</label></div>${mode==='auto'?'<p class="score-note">Pas de punten aan in de rubric via ‘Automatische scores: tonen’.</p>':mode==='manual'?`<div class="score-max-setting"><label for="maxScore">Maximumscore</label><input id="maxScore" type="number" min="1" max="100" step="1" value="${r.maxScore}" onchange="setMaxScore(this.value)"><span>punten</span></div>`:''}<div class="score-footer"><button class="primary" onclick="closeScoreSettings(true)">Gereed</button></div></div></div>`}
+function toggleAutoScoreVisibility(){const r=chosen();if(!r||r.scoreMode!=='auto')return;if(visibleAutoScores.has(r.id))visibleAutoScores.delete(r.id);else visibleAutoScores.add(r.id);renderAll()}
+function adjustAutoPoints(axis,index,delta){const r=chosen();if(!r||r.scoreMode!=='auto')return;ensurePoints(r);for(let j=0;j<r.criteria.length;j++){for(let n=0;n<r.levels.length;n++){if(axis==='cell'&&j!==index[0]||axis==='cell'&&n!==index[1])continue;if(axis==='criterion'&&j!==index||axis==='level'&&n!==index)continue;r.pointValues[j][n]=Math.max(0,(Number(r.pointValues[j][n])||0)+delta)}}const wrap=document.querySelector('#editor .tablewrap');const scrollTop=wrap?.scrollTop??0;const scrollLeft=wrap?.scrollLeft??0;const pageX=window.scrollX,pageY=window.scrollY;renderAll();const updated=document.querySelector('#editor .tablewrap');if(updated){updated.scrollTop=scrollTop;updated.scrollLeft=scrollLeft}window.scrollTo(pageX,pageY)}
+function pointControl(axis,index,value,label){const arg=Array.isArray(index)?`[${index.join(',')}]`:index;return `<div class="point-control" aria-label="${esc(label)}"><button type="button" aria-label="${esc(label)} verlagen" onclick="adjustAutoPoints('${axis}',${arg},-1)">−</button><span>${value===null?'±1':esc(value)}</span><button type="button" aria-label="${esc(label)} verhogen" onclick="adjustAutoPoints('${axis}',${arg},1)">+</button></div>`}
+
+function openRubricNameDialog(mode){
+ const current=chosen();if(mode==='rename'&&!current)return;
+ const modal=$('rubricNameModal');const existing=mode==='rename'?current.name:'';
+ modal.innerHTML=`<div class="bulk-backdrop" onclick="if(event.target===this)closeRubricNameDialog()"><div class="bulk-dialog rubric-name-dialog" role="dialog" aria-modal="true" aria-labelledby="rubricNameTitle"><div class="bulk-head"><h3 id="rubricNameTitle">${mode==='rename'?'Naam wijzigen':'Nieuwe rubric'}</h3><button type="button" onclick="closeRubricNameDialog()" aria-label="Sluiten">×</button></div><form onsubmit="saveRubricName(event,'${mode}')"><label for="rubricNameInput">Naam rubric</label><input id="rubricNameInput" type="text" maxlength="100" required value="${esc(existing)}" placeholder="Naam rubric" autocomplete="off"><div class="score-footer"><button type="button" onclick="closeRubricNameDialog()">Annuleren</button><button type="submit" class="primary">${mode==='rename'?'Opslaan':'Aanmaken'}</button></div></form></div></div>`;
+ modal.classList.remove('hidden');const input=$('rubricNameInput');input.focus();if(mode==='rename')input.select();
+}
+function closeRubricNameDialog(){$('rubricNameModal').classList.add('hidden');$('rubricNameModal').innerHTML=''}
+function saveRubricName(event,mode){event.preventDefault();const name=$('rubricNameInput').value.trim();if(!name)return; if(mode==='rename'){const r=chosen();if(r)r.name=name;}else{const r=blank();r.name=name;state.rubrics.push(r);if(!state.activeRubric)state.activeRubric=r.id;editorRubricId=r.id;}closeRubricNameDialog();renderAll()}
+function newRubric(){openRubricNameDialog('new')}
+function renameCurrentRubric(){openRubricNameDialog('rename')}
+function deleteRubric(){if(!state.rubrics.length)return;let r=chosen();if(!confirm('Rubric '+r.name+' verwijderen?'))return;state.rubrics=state.rubrics.filter(x=>x.id!==r.id);if(state.activeRubric===r.id)state.activeRubric=state.rubrics[0]?.id||'';if(editorRubricId===r.id)editorRubricId=state.rubrics[0]?.id||'';renderAll()}
+function selectDesignRubric(id){editorRubricId=id;renderAll()}
+function renderDesignTabs(){const tabs=$('designTabs');tabs.innerHTML=state.rubrics.map(r=>`<button role="tab" aria-selected="${r.id===editorRubricId}" class="rubric-tab ${r.id===editorRubricId?'selected':''}" onclick="selectDesignRubric('${esc(r.id)}')">${esc(r.name)}</button>`).join('')}
+function renderAll(){if(!state.rubrics.some(r=>r.id===editorRubricId))editorRubricId=state.rubrics[0]?.id||'';const active=chosen();const auto=active?.scoreMode==='auto';const toggle=$('autoScoreToggle');toggle.classList.toggle('hidden',!auto);if(auto){const visible=visibleAutoScores.has(active.id);toggle.textContent=visible?'✓ Automatische scores: verbergen ▴':'✓ Automatische scores: tonen ▾';toggle.setAttribute('aria-pressed',String(visible));}$('manualScoreToggle').classList.toggle('hidden',active?.scoreMode!=='manual');$('rubricSelector').classList.toggle('hidden',!state.rubrics.length);$('designEditActions').classList.toggle('hidden',!state.rubrics.length);renderDesignTabs();renderSessionTitle();$('sessionDate').value=state.date;renderEditor();renderEval()}
+function renderEditor(){
+ let r=chosen();
+ if(!r){$('editor').innerHTML='<div class="empty-state"><div class="empty-icon">＋</div><h3>Nog geen rubrics</h3><button class="primary" onclick="newRubric()">Nieuwe rubric maken</button><button onclick="document.getElementById(&quot;rubricFile&quot;).click()">Rubric importeren</button></div>';return;}
+ ensurePoints(r);
+ const showPoints=r.scoreMode==='auto'&&visibleAutoScores.has(r.id);
+ if(showPoints){
+  const maxima=r.criteria.map((_,j)=>Math.max(0,...r.pointValues[j].map(v=>Number(v)||0)));
+  const total=maxima.reduce((a,b)=>a+b,0);
+  $('editor').innerHTML=`<div class="score-matrix-heading"><strong>Puntenverdeling</strong><strong>Maximale totaalscore: ${total} punten</strong></div><div class="tablewrap"><table class="editor score-editor"><thead><tr><th>Criterium</th>${r.levels.map((l,i)=>`<th><div>${esc(l)}</div>${pointControl('level',i,null,'Alle punten voor '+l)}</th>`).join('')}</tr></thead><tbody>${r.criteria.map((c,j)=>`<tr><td><strong>${esc(c)}</strong><div class="criterion-maximum">Max. ${maxima[j]} punten</div>${pointControl('criterion',j,null,'Alle punten voor '+c)}</td>${r.levels.map((l,i)=>`<td>${pointControl('cell',[j,i],r.pointValues[j][i],'Punten '+c+' '+l)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  return;
+ }
+ $('editor').innerHTML=`<div class="tablewrap"><table class="editor"><thead><tr><th>Criterium</th>${r.levels.map((l,i)=>`<th><input aria-label="Prestatieniveau" value="${esc(l)}" onchange="editLevel(${i},this.value)"></th>`).join('')}</tr></thead><tbody>${r.criteria.map((c,j)=>`<tr><td><input aria-label="Criterium" value="${esc(c)}" onchange="editCriterion(${j},this.value)"><button title="Verwijder criterium" onclick="removeCriterion(${j})">×</button></td>${r.levels.map((l,i)=>`<td><textarea aria-label="Beschrijving ${esc(c)} ${esc(l)}" onchange="editDesc(${i},${j},this.value)">${esc(r.descriptions[i]?.[j]||'')}</textarea></td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+}
+
+function editCriterion(j,v){chosen().criteria[j]=v;renderAll()}
+function editLevel(i,v){chosen().levels[i]=v;renderEval()}
+function editDesc(i,j,v){chosen().descriptions[i][j]=v}
+function openCountPicker(kind){
+ const r=chosen();if(!r)return;
+ const isCriteria=kind==='criteria',current=isCriteria?r.criteria.length:r.levels.length;
+ const min=isCriteria?1:2,max=isCriteria?15:6;
+ const title=isCriteria?'Aantal criteria':'Aantal niveaus';
+ $('countModal').innerHTML=`<div class="bulk-backdrop" onclick="if(event.target===this)closeCountPicker()"><div class="bulk-dialog count-dialog" role="dialog" aria-modal="true" aria-label="${title}"><div class="bulk-head"><h3>${title}</h3><button onclick="closeCountPicker()" aria-label="Sluiten">×</button></div><div class="count-grid">${Array.from({length:max-min+1},(_,i)=>i+min).map(n=>`<button class="${n===current?'chosen':''}" onclick="setRubricCount('${kind}',${n})">${n}</button>`).join('')}</div><p class="count-note">Bestaande inhoud blijft behouden wanneer je het aantal verhoogt.</p></div></div>`;
+ $('countModal').classList.remove('hidden');
+}
+function closeCountPicker(){$('countModal').classList.add('hidden');$('countModal').innerHTML=''}
+function setRubricCount(kind,count){
+ const r=chosen();if(!r)return;
+ const isCriteria=kind==='criteria',current=isCriteria?r.criteria.length:r.levels.length;
+ if(count<current){
+  const text=isCriteria?'criteria':'niveaus';
+  if(!confirm(`Aantal ${text} verlagen van ${current} naar ${count}? De verwijderde onderdelen en bijbehorende beschrijvingen worden uit de rubric gehaald.`))return;
+ }
+ if(isCriteria){
+  while(r.criteria.length<count)addCriterion(false);
+  while(r.criteria.length>count)removeCriterion(r.criteria.length-1,false);
+ }else{
+  while(r.levels.length<count)addLevel(false);
+  while(r.levels.length>count)removeLevel(false);
+ }
+ closeCountPicker();renderAll();
+}
+function addCriterion(refresh=true){let r=chosen();r.criteria.push('Nieuw criterium');if(r.pointValues)r.pointValues.push(r.levels.map((_,n)=>r.levels.length-1-n));r.descriptions.forEach(a=>a.push(''));if(refresh)renderAll()}
+function removeCriterion(j,refresh=true){let r=chosen();if(r.criteria.length<2)return toast('Minstens één criterium behouden');r.criteria.splice(j,1);if(r.pointValues)r.pointValues.splice(j,1);r.descriptions.forEach(a=>a.splice(j,1));if(refresh)renderAll()}
+function addLevel(refresh=true){let r=chosen();if(r.levels.length>=6)return toast('Maximaal zes niveaus');r.levels.push('Niveau '+(r.levels.length+1));if(r.pointValues)r.pointValues.forEach(a=>a.push(0));r.descriptions.push(r.criteria.map(() => ''));if(refresh)renderAll()}
+function removeLevel(refresh=true){let r=chosen();if(r.levels.length<=2)return toast('Minstens twee niveaus');r.levels.pop();if(r.pointValues)r.pointValues.forEach(a=>a.pop());r.descriptions.pop();if(refresh)renderAll()}
+function readExcel(file){return file.arrayBuffer().then(b=>XLSX.read(b,{type:'array'}))}
+function checkXlsx(){if(!window.XLSX){toast('Excel-bibliotheek niet geladen. Controleer internetverbinding.');return false}return true}
+async function importRubrics(e){
+ if(!checkXlsx()||!e.target.files[0])return;
+ try{
+  const wb=await readExcel(e.target.files[0]),arr=[],bySheet=new Map();
+  let config=null;
+  if(wb.SheetNames.includes('_Score-instellingen')){
+   const raw=XLSX.utils.sheet_to_json(wb.Sheets['_Score-instellingen'],{header:1,defval:''});
+   if(raw[0]?.[0]==='LO_RUBRIC_SCORES_V1')config=raw.slice(1);
+  }
+  for(const sheet of wb.SheetNames){
+   if(sheet==='_Score-instellingen')continue;
+   const a=XLSX.utils.sheet_to_json(wb.Sheets[sheet],{header:1,defval:''});
+   const header=a[0]||[];
+   const levelIndices=header.map((v,i)=>i>0&&String(v).trim()?i:-1).filter(i=>i>0);
+   const rows=a.slice(1).filter(x=>String(x[0]??'').trim());
+   if(!levelIndices.length||!rows.length)continue;
+   const r={id:crypto.randomUUID(),name:sheet,criteria:rows.map(x=>String(x[0]).trim()),levels:levelIndices.map(i=>String(header[i]).trim()),descriptions:levelIndices.map(i=>rows.map(row=>String(row[i]??'')))};
+   arr.push(r);bySheet.set(sheet,r);
+  }
+  if(!arr.length)throw Error('Geen geldig tabblad: verwacht niveaus vanaf B1 en criteria vanaf A2');
+  if(config)for(const row of config){
+   const [sheet,mode,max,j,n,points]=row,r=bySheet.get(String(sheet));
+   if(!r)continue;
+   ensurePoints(r);
+   if(['none','auto','manual'].includes(mode))r.scoreMode=mode;
+   if(max!==''&&Number.isInteger(Number(max))&&Number(max)>=1)r.maxScore=Math.min(100,Number(max));
+   if(j!==''&&n!==''&&Number.isInteger(Number(j))&&Number.isInteger(Number(n))&&Number(j)>=0&&Number(j)<r.criteria.length&&Number(n)>=0&&Number(n)<r.levels.length){r.pointValues[Number(j)][Number(n)]=points===''?'':Number(points)}
+  }
+  state.rubrics.push(...arr);editorRubricId=arr[0].id;
+  if(!state.activeRubric)state.activeRubric=arr[0].id;
+  renderAll();toast(arr.length+' rubric(s) geïmporteerd');
+ }catch(err){alert('Import mislukt: '+err.message)}
+ e.target.value='';
+}
+function rubricSheet(r){return [ ['',...r.levels],...r.criteria.map((c,j)=>[c,...r.levels.map((_,i)=>r.descriptions[i]?.[j]||'')]) ]}
+function exportRubrics(){
+ if(!state.rubrics.length)return toast('Maak of importeer eerst een rubric');
+ if(!checkXlsx())return;
+ const wb=XLSX.utils.book_new(),config=[['LO_RUBRIC_SCORES_V1','Modus','Maximumscore','CriteriumIndex','NiveauIndex','Punten']];
+ state.rubrics.forEach((r,i)=>{
+  ensurePoints(r);
+  const sheet=uniqueSheetName(wb,r.name||'Rubric '+(i+1));
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rubricSheet(r)),sheet);
+  config.push([sheet,r.scoreMode,r.maxScore,'','','']);
+  r.criteria.forEach((_,j)=>r.levels.forEach((_,n)=>config.push([sheet,'','',j,n,r.pointValues[j][n]])));
+ });
+ XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(config),'_Score-instellingen');
+ if(!wb.Workbook)wb.Workbook={};if(!wb.Workbook.Sheets)wb.Workbook.Sheets=wb.SheetNames.map(name=>({name}));const sh=wb.Workbook.Sheets.find(x=>x.name==='_Score-instellingen');if(sh)sh.Hidden=1;
+ XLSX.writeFile(wb,'LO-rubrics.xlsx');
+}
+function uniqueSheetName(wb,name){let base=name.replace(/[\\/?*\[\]:]/g,' ').slice(0,27)||'Rubric',n=base,k=2;while(wb.SheetNames.includes(n))n=(base.slice(0,25)+' '+k++).slice(0,31);return n}
+function printRubric(){let r=chosen();if(!r)return toast('Maak of importeer eerst een rubric');$('print').innerHTML=`<h1>${esc(r.name)}</h1><table><colgroup><col style="width:16%">${r.levels.map(()=>`<col style="width:${84/r.levels.length}%">`).join('')}</colgroup><thead><tr><th>Criterium</th>${r.levels.map(l=>`<th>${esc(l)}</th>`).join('')}</tr></thead><tbody>${r.criteria.map((c,j)=>`<tr><th>${esc(c)}</th>${r.levels.map((l,i)=>`<td>${esc(r.descriptions[i]?.[j]||'')}</td>`).join('')}</tr>`).join('')}</tbody></table>`;window.print()}
+async function importClass(e){if(!checkXlsx()||!e.target.files[0])return;try{let wb=await readExcel(e.target.files[0]),rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:''}).filter(r=>r.some(x=>String(x).trim()));if(!rows.length)throw Error('Lege klaslijst');let hdr=rows[0].map(x=>String(x).toLowerCase().trim()),ni=hdr.findIndex(x=>['naam','achternaam','name'].includes(x)),fi=hdr.findIndex(x=>['voornaam','first name'].includes(x));let names=(ni>=0?rows.slice(1).map(r=>[r[fi]||'',r[ni]||''].join(' ').trim()):rows.map(r=>String(r[0]||'').trim())).filter(Boolean);if(!names.length)throw Error('Geen leerlingen gevonden');if(Object.keys(state.scores).length&&!confirm('Klaslijst vervangen? Bestaande beoordelingen worden gewist.'))return;state.students=names;state.scores={};state.rubrics.forEach(r=>r.manualScores={});state.groups=[];state.studentGroups={};renderEval();toast(names.length+' leerlingen ingeladen')}catch(err){alert('Klaslijst niet ingeladen: '+err.message)}e.target.value=''}
+function addStudent(){let name=prompt('Naam leerling');if(name?.trim()){state.students.push(name.trim());renderEval()}}
+function key(rid,i,j){return rid+'|'+i+'|'+j}
+function openEvalInfo(){let el=$('evalInfoModal');el.classList.remove('hidden');el.innerHTML=`<div class="bulk-backdrop" onclick="if(event.target===this)closeEvalInfo()"><div class="bulk-dialog" role="dialog" aria-modal="true" aria-label="Informatie over evalueren"><div class="bulk-head"><h3>Informatie</h3><button onclick="closeEvalInfo()" aria-label="Sluiten">×</button></div><p><strong>Beoordelen:</strong> tik op een niveau om een leerling te beoordelen. Tik opnieuw op hetzelfde niveau om de beoordeling te wissen.</p><p><strong>Groepsbeoordeling:</strong> tik op een criteriumtitel om alle leerlingen tegelijk een niveau toe te kennen. Je kunt deze actie onmiddellijk ongedaan maken.</p><p><strong>Klaslijst:</strong> importeer een Excel-bestand met een kolom Naam (optioneel Voornaam), of één naam per rij.</p><p><strong>Sessie bewaren:</strong> exporteer een Excel-bestand met leerlingen, rubrics, groepen en scores. Met Sessie hervatten open je dit bestand opnieuw.</p></div></div>`}
+function closeEvalInfo(){let el=$('evalInfoModal');el.classList.add('hidden');el.innerHTML=''}
+function toggleDesignSettings(){const panel=$('designSettings');const open=!panel.classList.toggle('hidden');const btn=$('designSettingsButton');btn.setAttribute('aria-expanded',String(open));btn.textContent=open?'Minder opties ▴':'Meer opties ▾';}
+function renderSessionTitle(){const el=$('sessionTitle');const name=(state.sessionName||'').trim();el.textContent=name;el.classList.toggle('hidden',!name)}
+function openSessionNameDialog(){
+ const modal=$('sessionNameModal');
+ modal.classList.remove('hidden');
+ modal.innerHTML=`<div class="bulk-backdrop" onclick="if(event.target===this)closeSessionNameDialog()"><div class="bulk-dialog rubric-name-dialog" role="dialog" aria-modal="true" aria-labelledby="sessionNameTitle"><div class="bulk-head"><h3 id="sessionNameTitle">Sessienaam wijzigen</h3><button type="button" onclick="closeSessionNameDialog()" aria-label="Sluiten">×</button></div><form onsubmit="saveSessionName(event)"><label for="sessionNameInput">Naam evaluatiesessie</label><input id="sessionNameInput" type="text" maxlength="100" value="${esc(state.sessionName)}" placeholder="Naam evaluatiesessie" autocomplete="off"><div class="score-footer"><button type="button" onclick="closeSessionNameDialog()">Annuleren</button><button type="submit" class="primary">Opslaan</button></div></form></div></div>`;
+ $('sessionNameInput').focus();$('sessionNameInput').select();
+}
+function closeSessionNameDialog(){$('sessionNameModal').classList.add('hidden');$('sessionNameModal').innerHTML=''}
+function saveSessionName(event){event.preventDefault();state.sessionName=$('sessionNameInput').value.trim();closeSessionNameDialog();renderSessionTitle()}
+function toggleSettings(){let panel=$('sessionSettings'),open=panel.classList.toggle('hidden')===false;$('settingsButton').setAttribute('aria-expanded',String(open));$('settingsButton').textContent=open?'Minder opties ▴':'Meer opties ▾';$('settingsButton').title=open?'Minder opties':'Meer opties'}
+function selectEvalRubric(id){state.activeRubric=id;renderEval()}
+function renderEvalTabs(){let tabs=$('evalTabs');if(!tabs)return;tabs.innerHTML=state.rubrics.map(r=>`<button role="tab" aria-selected="${r.id===state.activeRubric}" class="rubric-tab ${r.id===state.activeRubric?'selected':''}" onclick="selectEvalRubric('${esc(r.id)}')">${esc(r.name)}</button>`).join('')}
+function renderEval(){renderSessionTitle();renderEvalTabs();let r=state.rubrics.find(x=>x.id===state.activeRubric)||state.rubrics[0];if(r&&state.activeRubric!==r.id){state.activeRubric=r.id;renderEvalTabs()}if(!r){$('progress').textContent='Geen rubric';$('evaluation').innerHTML='<div class="empty-state"><h3>Nog geen rubric beschikbaar</h3><div class="empty-start-actions"><button onclick="show(&quot;design&quot;)">Naar rubricontwerper</button><button class="primary" type="button" onclick="document.getElementById(&quot;sessionFile&quot;).click()">Sessie hervatten</button></div></div>';return;}if(!state.students.length){$('progress').textContent='0 leerlingen';$('evaluation').innerHTML='<div class="empty-state"><h3>Nog geen leerlingen</h3><div class="empty-start-actions"><button type="button" onclick="addStudent()">Leerling toevoegen</button><button class="primary" type="button" onclick="document.getElementById(&quot;classFile&quot;).click()">Klaslijst importeren</button><button type="button" onclick="document.getElementById(&quot;sessionFile&quot;).click()">Sessie hervatten</button></div></div>';return;}let all=state.students.length*r.criteria.length,done=state.students.reduce((s,_,i)=>s+r.criteria.filter((_,j)=>state.scores[key(r.id,i,j)]!==undefined).length,0);$('progress').textContent=`${done}/${all} beoordeeld`;let groupRows=state.students.map((name,i)=>({name,i,group:state.groups.find(g=>g.id===state.studentGroups[i])})).sort((a,b)=>{let ai=a.group?state.groups.indexOf(a.group):9999,bi=b.group?state.groups.indexOf(b.group):9999;return ai-bi||a.i-b.i});$('evaluation').innerHTML=`<div class="tablewrap"><table class="eval-matrix"><thead><tr><th>Leerling</th>${r.criteria.map((c,j)=>`<th class="criterion-col"><button title="${esc(c)} — alle leerlingen beoordelen" onclick="bulk('${r.id}',${j})">${esc(c)} ▾</button></th>`).join('')}${r.scoreMode&&r.scoreMode!=='none'?'<th class="total-col">Totaalscore</th>':''}</tr></thead><tbody>${groupRows.map(({name:s,i,group})=>`<tr><td><span class="student-name">${group?`<span class="group-dot" style="background:${group.color}" title="${esc(group.name)}"></span>`:''}${esc(s)}</span></td>${r.criteria.map((c,j)=>`<td class="criterion-col"><div class="segments">${r.levels.map((l,n)=>`<button class="${state.scores[key(r.id,i,j)]===n?'sel':''}" title="${esc(l)}: ${esc(r.descriptions[n]?.[j]||'')}" onclick="score('${r.id}',${i},${j},${n})">${r.scoreMode==='auto'?esc(r.pointValues?.[j]?.[n]??(r.levels.length-1-n)):r.levels.length-n}</button>`).join('')}</div></td>`).join('')}${r.scoreMode==='auto'?`<td class="total-col total-value">${totalScore(r,i)}</td>`:r.scoreMode==='manual'?`<td class="total-col"><button class="manual-score-button" aria-label="Totaalscore kiezen voor ${esc(s)}" onclick="openManualPicker('${r.id}',${i},event)">${r.manualScores?.[i]===undefined?'—':esc(r.manualScores[i])+'/'+r.maxScore}</button></td>`:''}</tr>`).join('')}</tbody></table></div>`}
+const groupPalette=['#e8bd30','#e05252','#377ed2','#31966b','#ed8b36','#8c66b5','#e78fb6','#555555'];
+let editingGroupId=null,groupDraft=[];
+function openGroups(id=null){editingGroupId=id;const g=state.groups.find(x=>x.id===id);groupDraft=g?state.students.map((_,i)=>state.studentGroups[i]===g.id):state.students.map(()=>false);renderGroupDialog()}
+function closeGroups(){$('groupModal').classList.add('hidden');$('groupModal').innerHTML=''}
+function renderGroupDialog(){let g=state.groups.find(x=>x.id===editingGroupId);let name=g?.name||`Groep ${state.groups.length+1}`,color=g?.color||groupPalette[state.groups.length%groupPalette.length];let el=$('groupModal');el.innerHTML=`<div class="bulk-backdrop" onclick="if(event.target===this)closeGroups()"><div class="bulk-dialog group-dialog" role="dialog" aria-modal="true" aria-label="Groepen maken"><div class="bulk-head"><div><h3>Groepen maken</h3><p>Leerlingen verschijnen per groep in het evaluatiescherm.</p></div><button aria-label="Sluiten" onclick="closeGroups()">×</button></div><div class="group-existing">${state.groups.map(x=>`<button class="group-chip" onclick="openGroups('${esc(x.id)}')"><span class="group-dot" style="background:${x.color}"></span>${esc(x.name)}</button>`).join('')}<button onclick="openGroups()">＋ Nieuwe groep</button></div><div class="group-footer">${g?`<button class="group-delete" title="Groep verwijderen" aria-label="Groep verwijderen" onclick="deleteGroup('${esc(g.id)}')">♲ Verwijderen</button>`:''}<button class="primary" onclick="saveGroup()">Groep opslaan</button></div><label class="group-label">Groepsnaam <input id="groupName" maxlength="70" value="${esc(name)}"></label><div class="group-label">Kleur <div class="group-colors">${groupPalette.map(c=>`<button type="button" class="group-color ${c===color?'chosen':''}" style="--group-color:${c}" data-color="${c}" aria-label="Kleur kiezen" onclick="chooseGroupColor(this)"></button>`).join('')}</div></div><div class="group-label">Leerlingen <span id="groupSelectedCount">${groupDraft.filter(Boolean).length} geselecteerd</span></div><div class="group-students">${state.students.map((n,i)=>{let other=state.groups.find(x=>x.id===state.studentGroups[i]&&x.id!==editingGroupId);return `<label class="group-student"><input type="checkbox" ${groupDraft[i]?'checked':''} onchange="groupDraft[${i}]=this.checked;document.getElementById('groupSelectedCount').textContent=groupDraft.filter(Boolean).length+' geselecteerd'"><span>${esc(n)}</span>${other?`<small>Nu in ${esc(other.name)}</small>`:''}</label>`}).join('')}</div></div></div>`;el.classList.remove('hidden')}
+function chooseGroupColor(button){document.querySelectorAll('.group-color').forEach(x=>x.classList.remove('chosen'));button.classList.add('chosen')}
+function saveGroup(){let name=$('groupName').value.trim();if(!name)return alert('Geef de groep een naam.');let color=document.querySelector('.group-color.chosen')?.dataset.color||groupPalette[0];let id=editingGroupId||crypto.randomUUID();if(!groupDraft.some(Boolean))return alert('Selecteer minstens één leerling.');let g=state.groups.find(x=>x.id===id);if(g){g.name=name;g.color=color}else state.groups.push({id,name,color});state.students.forEach((_,i)=>{if(groupDraft[i])state.studentGroups[i]=id;else if(state.studentGroups[i]===id)delete state.studentGroups[i]});renderEval();openGroups();toast('Groep bewaard · maak de volgende groep')}
+function deleteGroup(id){if(!confirm('Deze groep verwijderen? De leerlingen en hun scores blijven behouden.'))return;state.groups=state.groups.filter(g=>g.id!==id);Object.keys(state.studentGroups).forEach(i=>{if(state.studentGroups[i]===id)delete state.studentGroups[i]});renderEval();openGroups();toast('Groep verwijderd')}
+function score(id,i,j,n){let k=key(id,i,j);if(state.scores[k]===n)delete state.scores[k];else state.scores[k]=n;renderEval()}
+let bulkUndo=null,undoTimeout=null;
+function closeBulk(){const el=$('bulkModal');el.classList.add('hidden');el.innerHTML='';}
+function bulk(id,j){
+ const r=state.rubrics.find(x=>x.id===id);if(!r)return;
+ const el=$('bulkModal');
+ el.innerHTML=`<div class="bulk-backdrop" onclick="if(event.target===this)closeBulk()"><div class="bulk-dialog" role="dialog" aria-modal="true" aria-label="Alle leerlingen beoordelen"><div class="bulk-head"><div><h3>${esc(r.criteria[j])}</h3><p>Ken alle ${state.students.length} leerlingen hetzelfde niveau toe. Bestaande scores worden vervangen.</p></div><button aria-label="Sluiten" onclick="closeBulk()">×</button></div><div class="bulk-levels">${r.levels.map((l,n)=>`<button title="${esc(l)}" aria-label="${esc(l)}" onclick="applyBulk('${id}',${j},${n})">${r.levels.length-n}</button>`).join('')}</div></div></div>`;
+ el.classList.remove('hidden');
+}
+function applyBulk(id,j,n){
+ const before=state.students.map((_,i)=>{let k=key(id,i,j);return [k,Object.prototype.hasOwnProperty.call(state.scores,k),state.scores[k]]});
+ state.students.forEach((_,i)=>state.scores[key(id,i,j)]=n);
+ bulkUndo=before;closeBulk();renderEval();
+ const bar=$('undoBar');bar.innerHTML=`<span>Score toegekend aan ${state.students.length} leerlingen</span><button onclick="undoBulk()">Ongedaan maken</button>`;bar.classList.remove('hidden');
+ if(undoTimeout)clearTimeout(undoTimeout);undoTimeout=setTimeout(()=>{bar.classList.add('hidden');bulkUndo=null},8000);
+}
+function undoBulk(){if(!bulkUndo)return;for(const [k,exists,v] of bulkUndo){if(exists)state.scores[k]=v;else delete state.scores[k]}bulkUndo=null;$('undoBar').classList.add('hidden');if(undoTimeout)clearTimeout(undoTimeout);renderEval();}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeBulk()});
+function exportSession(){if(!state.rubrics.length)return toast('Voeg eerst een rubric toe');if(!checkXlsx())return;let wb=XLSX.utils.book_new();function add(name,rows){XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),name)}add('Sessie',[['LO_EVALUATIE_SESSIE','1'],['Naam',state.sessionName],['Datum',state.date],['ActieveRubric',state.activeRubric]]);add('Leerlingen',[['LeerlingIndex','Naam'],...state.students.map((s,i)=>[i,s])]);add('Rubrics',[['RubricID','Naam','NiveauIndex','Niveau','CriteriumIndex','Criterium','Beschrijving'],...state.rubrics.flatMap(r=>r.levels.flatMap((l,n)=>r.criteria.map((c,j)=>[r.id,r.name,n,l,j,c,r.descriptions[n]?.[j]||''])))]);add('Groepen',[['GroepID','Groepsnaam','Kleur'],...(state.groups||[]).map(g=>[g.id,g.name,g.color])]);add('Groepsindeling',[['LeerlingIndex','GroepID'],...Object.entries(state.studentGroups||{}).map(([i,id])=>[Number(i),id])]);add('Totaalscores',[['RubricID','Modus','CriteriumIndex','NiveauIndex','Punten','LeerlingIndex','HandmatigeScore','Maximumscore'],...state.rubrics.flatMap(r=>{ensurePoints(r);return [[r.id,r.scoreMode,'','','','','',r.maxScore],...r.pointValues.flatMap((a,j)=>a.map((v,n)=>[r.id,'',j,n,v,'',''])),...Object.entries(r.manualScores).map(([i,v])=>[r.id,'','','','',Number(i),v])]})]);add('Scores',[['RubricID','LeerlingIndex','CriteriumIndex','NiveauIndex'],...Object.entries(state.scores).map(([k,v])=>[...k.split('|').map((x,i)=>i?Number(x):x),v])]);const name=(state.sessionName||'Evaluatiesessie').trim().replace(/[\\/:*?"<>|]/g,'-').replace(/\s+/g,'-').replace(/^-+|-+$/g,'').slice(0,90)||'Evaluatiesessie';const today=new Date();const date=[today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-');XLSX.writeFile(wb,`${date}_${name}.xlsx`);toast('Sessie geëxporteerd')}
+async function importSession(e){if(!checkXlsx()||!e.target.files[0])return;try{let wb=await readExcel(e.target.files[0]);if(!['Sessie','Leerlingen','Rubrics','Scores'].every(n=>wb.SheetNames.includes(n)))throw Error('Dit is geen geldig sessiebestand');let rows=n=>XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1,defval:''});let meta=rows('Sessie');if(meta[0]?.[0]!=='LO_EVALUATIE_SESSIE')throw Error('Onbekend sessieformaat');let students=rows('Leerlingen').slice(1).map(x=>String(x[1]));let raw=rows('Rubrics').slice(1),map=new Map();for(let [id,name,ni,level,ci,criterion,description] of raw){if(!map.has(id))map.set(id,{id,name,criteria:[],levels:[],descriptions:[]});let r=map.get(id);r.criteria[ci]=criterion;r.levels[ni]=level;if(!r.descriptions[ni])r.descriptions[ni]=[];r.descriptions[ni][ci]=description}let rubrics=[...map.values()];if(wb.SheetNames.includes('Totaalscores'))for(const [id,mode,j,n,points,i,manual,maxScore] of rows('Totaalscores').slice(1)){let r=map.get(id);if(!r)continue;ensurePoints(r);if(['none','auto','manual'].includes(mode))r.scoreMode=mode;if(maxScore!==''&&Number.isInteger(Number(maxScore))&&Number(maxScore)>0)r.maxScore=Math.min(100,Number(maxScore));if(j!==''&&n!==''&&Number.isInteger(Number(j))&&Number.isInteger(Number(n))&&r.pointValues[Number(j)]&&Number(n)<r.levels.length)r.pointValues[Number(j)][Number(n)]=points===''?'':Number(points);if(i!==''&&Number.isInteger(Number(i))&&manual!=='')r.manualScores[Number(i)]=Number(manual)}if(!rubrics.length)throw Error('Geen rubrics in sessie');let scores={};for(let [id,i,j,n] of rows('Scores').slice(1)){if(!map.has(id)||!Number.isInteger(Number(i))||!Number.isInteger(Number(j))||!Number.isInteger(Number(n)))continue;scores[key(id,i,j)]=Number(n)}let groups=wb.SheetNames.includes('Groepen')?rows('Groepen').slice(1).filter(x=>x[0]).map(x=>({id:String(x[0]),name:String(x[1]||'Groep'),color:groupPalette.includes(String(x[2]))?String(x[2]):groupPalette[0]})):[];let studentGroups={};if(wb.SheetNames.includes('Groepsindeling'))for(let [i,id] of rows('Groepsindeling').slice(1)){if(Number.isInteger(Number(i))&&Number(i)>=0&&Number(i)<students.length&&groups.some(g=>g.id===String(id)))studentGroups[Number(i)]=String(id)}if(!confirm('Huidige sessie vervangen door dit bestand?'))return;editorRubricId=rubrics[0].id;state={rubrics,students,scores,groups,studentGroups,sessionName:String(meta[1]?.[1]||''),date:String(meta[2]?.[1]||''),activeRubric:map.has(meta[3]?.[1])?meta[3][1]:rubrics[0].id};renderAll();toast('Sessie hersteld')}catch(err){alert('Sessie niet ingeladen: '+err.message)}e.target.value=''}
+renderAll();
+</script><script>
+function openRubricInfo(){
+ const el=document.getElementById('rubricInfoModal');
+ el.innerHTML=`<div class="bulk-backdrop" onclick="if(event.target===this)closeRubricInfo()"><div class="bulk-dialog" role="dialog" aria-modal="true" aria-label="Rubricinformatie"><div class="bulk-head"><h3>Info</h3><button onclick="closeRubricInfo()" aria-label="Sluiten">×</button></div><ul class="rubric-info-list"><li>Maak een nieuwe rubric of importeer er één uit Excel.</li><li>Pas criteria, niveaus en beschrijvingen aan.</li><li>Gebruik meerdere rubrics binnen één evaluatiesessie.</li><li>Exporteer rubrics naar Excel of als afdrukbare PDF.</li></ul><p><strong>Excel importeren</strong></p><ul class="rubric-info-list"><li>Elk tabblad bevat één rubric; de tabbladnaam is de rubricnaam.</li><li>Criteria: kolom A, vanaf A2.</li><li>Niveaus: rij 1, vanaf B1.</li><li>Overige cellen: beschrijvingen.</li></ul></div></div>`;
+ el.classList.remove('hidden');
+}
+function closeRubricInfo(){const el=document.getElementById('rubricInfoModal');el.classList.add('hidden');el.innerHTML='';}
+</script></body></html>
